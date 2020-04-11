@@ -1,0 +1,37 @@
+Note While creating docker compose file 
+
+1. Specify the version
+    version: '3'
+
+2. Next will be adding 'services' which we need to use in our project
+    Underneath services , we will be adding service name , underneath servicename , we will specify image : image_name (from docker hub which is a base image)
+    services:
+        postgres:
+            image:'postgres:latest'
+        redis:
+            image:'redis:latest'
+3. Next we will be defining our server code base service which has a docker file .Following are the properties 
+    services:
+        server: //service name
+            build: // Here we specify the build properties for this service
+                dockerfile: Dockerfile.dev // Name of the docker file 
+                context: ./server // Context property specifies which folder we want to access from our current location . Just '.' specifies that we are looking in current directory . './foldername' means we looking for docker file in this directory
+            volume: // For Hot Reloading
+            environment: // To define environment variables which are used in api
+                - REDIST_HOST=redis
+                - REDIS_POR=6379
+                - PGUSER=postgres
+                - PGHOST=postgres
+                - PGDATABASE=postgres
+                - PGPASSWORD=postgres_password
+                - PGPORT=5432
+4. Similar process will be followed for worker and client
+5. Now there are React UI Routes and API routes which will be accessed from browser. 
+   We need to direct these HTTP requests to appropriate  services/servers to react ui server and express api server..
+   For this we are going to use and configure an nginx server
+   For this we are creating a nginx config file called default.conf -
+   In default we mention upstream client and server and give port to identify with the same defined in our docker compose file 
+   then we write server code to listen on port 80 and define routing locations for , thereby directing different routes to different server
+
+6. Also this nginx image needs to be build in docker compose by proving a dockerfile and context. We also need to map our desired port to port 80 nginx server
+

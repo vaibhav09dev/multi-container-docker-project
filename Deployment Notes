@@ -1,0 +1,7 @@
+1. Push Code to Github
+2. Travis automatically pulls repo
+3. Travis builds , tests image and tests code. 
+4. Travis builds prod image
+5. Travis pushes built prod images to docker hub
+6. Travis pushes project to AWS EB
+7. EB Pulls image from docker hub and deploys
