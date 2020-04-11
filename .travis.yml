@@ -1,0 +1,16 @@
+sudo: required
+services:
+    - docker
+
+before_install:
+    - docker build -t vaibhav09dev/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+    - docker run -e CI=true vaibhav09dev/react-test npm test -- --coverage
+
+after_success:
+    - docker build vaibhav09dev/multi-client ./client
+    - docker build vaibhav09dev/multi-nginx ./nginx
+    - docker build vaibhav09dev/multi-server ./server
+    - docker build vaibhav09dev/multi-worker ./worker
+    
