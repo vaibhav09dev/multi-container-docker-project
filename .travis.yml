@@ -14,3 +14,11 @@ after_success:
     - docker build vaibhav09dev/multi-server ./server
     - docker build vaibhav09dev/multi-worker ./worker
     
+    # Login to the Docker CLI
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+
+    #Take those images and push them to docker hub
+    - docker push vaibhav09dev/multi-client
+    - docker push vaibhav09dev/multi-nginx
+    - docker push vaibhav09dev/multi-server
+    - docker push vaibhav09dev/multi-worker
