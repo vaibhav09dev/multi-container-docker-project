@@ -35,3 +35,47 @@ Note While creating docker compose file
 
 6. Also this nginx image needs to be build in docker compose by proving a dockerfile and context. We also need to map our desired port to port 80 nginx server
 
+7. We create one more nginx configuration inside the client directory . First Nginx node is responsible to handle the routing of the projects. The one inside the client directory is responsible to expose project to a node and move production asset from build folder to nginx html directory
+
+8. Then we create travis.yaml to give the configuration for building the project. Following are the steps 
+1. sudo is required
+2. services used is of docker 
+3. 'before_install' scripst are run () . In this step , we run test cases (before this we build the docker file for which we are running the test) before deploying . If it is clear then then further processes are carried out
+4. 'after_success' , in this case we are building individually all our directory Dockerfiles
+    docker build - t vaibhav09dev/multi-client ./client (tagging build and giving context.. By default it takes Dockerfile unless specifically mentioned anything else by giving '-f' parameter followed by the filename)
+5. Once all these docker projects are build, we login to our Docker hub by following command
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+    The Docker ID and Docker password are defined as environment variables in travis ci project
+6. Once login is successful , we push these build docker images to docker hub with following command
+    - docker push vaibhav09dev/multi-client
+7. Once the docker images are pushed to Docker hub .. We start working towards how this can be deployed to AWS. In AWS these docker hub images will be pulled directly
+8. We need to deploy this to AWS EBS i.e Elastic Bean Stalk like we did in earlier docker-frontend project which was a single container project
+9. Here we elastic bean stalk doesnt know how to deploy but AWS elastic container service i.e ECS knows how to deploy . So we have to write task definitions for these conatiners. 
+Task definitions are written in Dockerrun.aws.json which has the configuration and task definition that AWS ECS requires
+10. Example of task definitions of services used
+     {
+            "name": "ui-client",
+            "image": "vaibhav09dev/multi-client",
+            "hostname": "client",
+            "essential": false
+    },
+    {
+            "name":"nginx",
+            "image": "vaibhav09dev/multi-nginx",
+            "hostname": "nginx",
+            "essential": true,
+            "portMappings":[
+                {
+                    "hostPort": 80,
+                    "containerPort": 80
+                }
+            ],
+            "links": ["ui-client","api-server"]
+        }
+
+11. In this project , we will be using AWS services for database 
+    AWS Elastic cache - for redis
+    AWS Relation Database Service(RDS) - for RDBMS , Postgres
+
+12. Our databases should be able to communicate with the EB instance that we have created. in order to enable this we need to create a security group in AWS using the VPC service (Virtual private cloud ). Here we need to define a security group by providing the port range to this group , fr ex redis port is 6379 and post gres port is 5342 then range will be 5342-6379 , in this way we need to connect our elastic bean stalk , redis and post gres db to single security group. we edit db settings to add this security group and EB as well which binds together there by enabling the communication between these services
+13.

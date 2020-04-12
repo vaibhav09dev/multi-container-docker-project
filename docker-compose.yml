@@ -17,7 +17,7 @@ services:
             context: ./server
         environment: 
             - REDIST_HOST=redis
-            - REDIS_POR=6379
+            - REDIS_PORT=6379
             - PGUSER=postgres
             - PGHOST=postgres
             - PGDATABASE=postgres
