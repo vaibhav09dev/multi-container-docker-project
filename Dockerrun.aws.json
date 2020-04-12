@@ -2,13 +2,13 @@
     "AWSEBDockerrunVersion": 2,
     "containerDefinitions": [
         {
-            "name": "ui-client",
+            "name": "client",
             "image": "vaibhav09dev/multi-client",
             "hostname": "client",
             "essential": false
         },
         {
-            "name": "api-server",
+            "name": "server",
             "image": "vaibhav09dev/multi-server",
             "hostname": "api",
             "essential": false
